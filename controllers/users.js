@@ -3,9 +3,9 @@ const { connection } = require("../config/db");
 const getUsers = async (req, res) => {
   try {
     console.log(req.body);
-    const { query } = await connection;
-    const [rows] = query("SELECT * FROM users");
-    res.status(200).json(rows);
+    const pool = await connection;
+    const [rows] = await pool.query("SELECT * FROM users");
+    res.status(200).json({rows});
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
@@ -17,6 +17,7 @@ const getUsers = async (req, res) => {
 const createUsers = async (req, res) => {
   try {
     const { email, name, age } = req.body;
+    const pool = await connection;
     const [result] = await pool.query(
       "INSERT INTO users (name, email, age) VALUES (?,?,?)",
       [name, email, age]
@@ -39,6 +40,7 @@ const createUsers = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
+    const pool = await connection;
     const [result] = await pool.query("DELETE FROM users WHERE id = ?", [id]);
     console.log(result);
     res.status(200).json({ message: "User deleted successfully" });
